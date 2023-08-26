@@ -11,7 +11,7 @@ uses
 
 resourcestring
   sBitVisualizerName = 'Bit Visualizer for Delphi';
-  sBitVisualizerDescription = 'Displays Hex and bit representations of Bytes';
+  sBitVisualizerDescription = 'Displays Decimal, Hex and Binary representations of Byte type';
 
 type
   TDebuggerBitVisualizer = class(TInterfacedObject, IOTADebuggerVisualizer,
@@ -261,12 +261,13 @@ begin
 end;
 
 var
-  DateTimeVis: IOTADebuggerVisualizer;
+  BitVis: IOTADebuggerVisualizer;
 
 procedure Register;
 begin
-  DateTimeVis := TDebuggerBitVisualizer.Create;
-  (BorlandIDEServices as IOTADebuggerServices).RegisterDebugVisualizer(DateTimeVis);
+  if Assigned(BitVis) then Exit;
+  BitVis := TDebuggerBitVisualizer.Create;
+  (BorlandIDEServices as IOTADebuggerServices).RegisterDebugVisualizer(BitVis);
 end;
 
 procedure RemoveVisualizer;
@@ -275,8 +276,8 @@ var
 begin
   if Supports(BorlandIDEServices, IOTADebuggerServices, DebuggerServices) then
   begin
-    DebuggerServices.UnregisterDebugVisualizer(DateTimeVis);
-    DateTimeVis := nil;
+    DebuggerServices.UnregisterDebugVisualizer(BitVis);
+    BitVis := nil;
   end;
 end;
 
