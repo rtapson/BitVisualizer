@@ -31,9 +31,14 @@ type
     { IOTADebuggerVisualizerValueReplacer }
     function GetReplacementValue(const Expression, TypeName, EvalResult: string): string;
     { IOTAThreadNotifier }
-    procedure EvaluteComplete(const ExprStr: string; const ResultStr: string;
-      CanModify: Boolean; ResultAddress: Cardinal; ResultSize: Cardinal;
-      ReturnCode: Integer);
+    procedure EvaluateComplete(const ExprStr, ResultStr: string; CanModify: Boolean;
+      ResultAddress, ResultSize: LongWord; ReturnCode: Integer); overload;
+
+    procedure EvaluateComplete(const ExprStr: string; const ResultStr: string;
+      CanModify: Boolean; ResultAddress: UInt64; ResultSize: Cardinal;
+      ReturnCode: Integer); overload;
+
+
     procedure ModifyComplete(const ExprStr: string; const ResultStr: string;
       ReturnCode: Integer);
     procedure ThreadNotify(Reason: TOTANotifyReason);
@@ -41,10 +46,8 @@ type
     procedure BeforeSave;
     procedure Destroyed;
     procedure Modified;
-    { IOTAThreadNotifier160 }
-    procedure EvaluateComplete(const ExprStr: string; const ResultStr: string;
-      CanModify: Boolean; ResultAddress: TOTAAddress; ResultSize: LongWord;
-      ReturnCode: Integer);
+
+
   end;
 
   TTypeLang = (tlDelphi, tlCpp);
@@ -57,7 +60,7 @@ type
   end;
 
 const
-  BitVisualizerTypes: array[0..0] of TBitVisualizerType =
+  BitVisualizerTypes: array[0..1] of TBitVisualizerType =
   (
     (TypeName: 'Byte'; TypeLang: tlDelphi; BitType: btByte;),
 //    (TypeName: 'TDate'; TypeLang: tlDelphi; DateTimeType: TBitType;),
@@ -91,6 +94,14 @@ begin
   // don't care about this notification
 end;
 
+procedure TDebuggerBitVisualizer.EvaluateComplete(const ExprStr,
+  ResultStr: string; CanModify: Boolean; ResultAddress, ResultSize: LongWord;
+  ReturnCode: Integer);
+begin
+  EvaluateComplete(ExprStr, ResultStr, CanModify, TOTAAddress(ResultAddress),
+    LongWord(ResultSize), ReturnCode);
+end;
+
 procedure TDebuggerBitVisualizer.Modified;
 begin
   // don't care about this notification
@@ -102,17 +113,7 @@ begin
   // don't care about this notification
 end;
 
-procedure TDebuggerBitVisualizer.EvaluteComplete(const ExprStr,
-  ResultStr: string; CanModify: Boolean; ResultAddress, ResultSize: Cardinal;
-  ReturnCode: Integer);
-begin
-  EvaluateComplete(ExprStr, ResultStr, CanModify, TOTAAddress(ResultAddress),
-    LongWord(ResultSize), ReturnCode);
-end;
-
-procedure TDebuggerBitVisualizer.EvaluateComplete(const ExprStr,
-  ResultStr: string; CanModify: Boolean; ResultAddress: TOTAAddress; ResultSize: LongWord;
-  ReturnCode: Integer);
+procedure TDebuggerBitVisualizer.EvaluateComplete(const ExprStr: string; const ResultStr: string; CanModify: Boolean; ResultAddress: UInt64; ResultSize: Cardinal; ReturnCode: Integer);
 begin
   FCompleted := True;
   if ReturnCode = 0 then
